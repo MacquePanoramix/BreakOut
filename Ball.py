@@ -8,8 +8,8 @@ class Ball(Object):
 
 
 
-        self.dx = 2
-        self.dy = 2
+        self.dx = 0.5
+        self.dy = 0.5
 
     def move(self):
 
@@ -30,14 +30,14 @@ class Ball(Object):
             self.dx *= -1
             self.move()
 
-        if self.y < wall_up or self.y + self.size_y > wall_down: #VERTICAL WALLS
+        if self.y < wall_up: #or self.y + self.size_y > wall_down: #VERTICAL WALLS
             self.dy *= -1
             self.move()
 
 
     def bounce_block(self, block):
         #Collision detection for blocks
-        if self.x >= block.x and self.x <= block.x + block.size_x and self.y >= block.y and self.y <= block.y + block.size_y:
+        if self.x + self.size_x >= block.x and self.x <= block.x + block.size_x and self.y + self.size_y >= block.y and self.y <= block.y + block.size_y:
             #Bounce horizontally:
             if self.x + self.dx < block.x or self.x - self.dx - self.size_x > block.x + block.size_x:
                 self.dx *= -1
@@ -49,4 +49,15 @@ class Ball(Object):
                 self.move()
                 block.hit()
 
+    def bounce_player(self, player):
+        # Collision detection for player
+        if self.x + self.size_x >= player.x and self.x <= player.x + player.size_x and self.y + self.size_y >= player.y and self.y <= player.y + player.size_y:
+            # Bounce horizontally:
+            if self.x - self.dx < player.x or self.x + self.dx + self.size_x > player.x + player.size_x:
+                self.dx *= -1
+                self.move()
+            # Bounce vertically:
+            if self.y - self.dy < player.y or self.y + self.dy + self.size_y > player.y + player.size_y:
+                self.dy *= -1
+                self.move()
 

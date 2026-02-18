@@ -5,6 +5,7 @@ from Block_Level import Block_Level
 
 from Canvas import Canvas
 from Ball import Ball
+from Player import Player
 
 class GameHandler():
 
@@ -15,17 +16,19 @@ class GameHandler():
 
     def game_set_up(self, screen, canvas, widthBlocks, heightBlocks):
         # Initiate Objects
-        ball, block_level = self.create_objects(canvas, widthBlocks, heightBlocks)
+        ball, block_level, player = self.create_objects(canvas, widthBlocks, heightBlocks)
 
         #Run the game loop
-        self.game_loop(screen, canvas, ball, block_level)
+        self.game_loop(screen, canvas, ball, block_level, player)
 
-    def game_loop(self, screen, canvas,ball, block_level):
+    def game_loop(self, screen, canvas,ball, block_level, player):
 
         while self.game_running:
 
-            self.handle_events()
+            self.handle_events(player)
             keys = pygame.key.get_pressed()
+
+            self.inputs(keys, player, canvas)
 
             #Draw canvas
             self.set_up_canvas(screen, canvas)
@@ -34,14 +37,23 @@ class GameHandler():
             self.update_blocks(block_level, screen, ball)
 
             #Move Objects
-            self.move_objects(ball, canvas, block_level)
+            self.move_objects(ball, canvas, player)
 
             # Draw objects
-            self.draw_objects(ball, screen, block_level)
+            self.draw_objects(ball, screen, player)
 
             pygame.display.flip()  # updates pygame canvas
 
-    def handle_events(self):
+
+    def inputs(self, keys, player, canvas):
+        #Quit key
+        if keys[pygame.K_q]:
+            pygame.QUIT
+
+        #Player keys
+        player.input(keys, canvas)
+
+    def handle_events(self, player):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:  # If the screen is closed, quit the program
                 self.game_running = False
@@ -62,7 +74,10 @@ class GameHandler():
         #Create ball
         ball = Ball(500,500,25,25)
 
-        return ball, block_level
+        #Create player
+        player = Player(500,750, 200, 25)
+
+        return ball, block_level, player
 
     def update_blocks(self, block_level, screen, ball):
 
@@ -70,15 +85,19 @@ class GameHandler():
         block_level.update_blocks(ball, screen)
 
 
-    def move_objects(self, ball, canvas, block_level):
+    def move_objects(self, ball, canvas, player):
 
         #Calculate colisions first
         ball.bounce_wall(canvas.gameLoc[0], canvas.gameSize[0], canvas.gameLoc[1], canvas.size[1])
+        ball.bounce_player(player)
 
         ball.move()
 
-    def draw_objects(self, ball, screen, block_level): #except blocks for performance reasons
+    def draw_objects(self, ball, screen, player): #except blocks for performance reasons
 
         #Draw Ball
         ball.display(screen)
+
+        #Draw player
+        player.display(screen)
 
