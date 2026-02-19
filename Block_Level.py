@@ -28,7 +28,7 @@ class Block_Level:
             layer.create_blocks(canvas, block_height, block_width)
 
 
-    def update_blocks(self, ball, screen):
+    def update_blocks(self, ball, screen, score):
         layer: BlockLayer
         for layer in self.layers:
             for block in layer.blocks:
@@ -38,5 +38,6 @@ class Block_Level:
                 ball.bounce_block(block)
                 # Also check if they should be destroyed afterward
                 if block.isDead():
+                    score.increase()
                     layer.blocks.remove(block)
 
